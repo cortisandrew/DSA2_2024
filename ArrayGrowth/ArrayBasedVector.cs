@@ -13,16 +13,30 @@ namespace ArrayGrowth
     /// The "Rank" is equal to the position in the array
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ArrayBasedVector<T>
+    public class ArrayBasedVector<T> : IVectorADT<T>
     {
         // Start off with an array of length 1 (mostly to be the same as the analysis on the slides)
         // Ideally, you start off with a larger array
-        private const int DEFAULT_LENGTH = 8;
-        
+        private const int DEFAULT_LENGTH = 1;
+
         // The array of items that are stored with the array based vector
         T[] array = new T[DEFAULT_LENGTH];
 
-        public ArrayBasedVector() { }
+        private volatile int workCarriedOut = 0;
+
+        public int WorkCarriedOut
+        {
+            get { return workCarriedOut; }
+        }
+
+        readonly IGrowthStrategy _growthStrategy;
+
+        public ArrayBasedVector() : this(new DoublingGrowthStrategy())
+        {
+        }
+        public ArrayBasedVector(IGrowthStrategy growthStrategy) { 
+            _growthStrategy = growthStrategy;
+        }
 
         /// <summary>
         /// The number of elements currently stored in the ArrayBasedVector
@@ -56,7 +70,7 @@ namespace ArrayGrowth
                 {
                     // rank cannot be < 0
                     // rank < count, because we want to refer to an existing element!
-                    throw new ArgumentOutOfRangeException(nameof(rank), $"Rank greater than or equal to 0 and smaller than or equal to {Count-1}, inclusive!");
+                    throw new ArgumentOutOfRangeException(nameof(rank), $"Rank greater than or equal to 0 and smaller than or equal to {Count - 1}, inclusive!");
                 }
 
                 return array[rank];
@@ -88,6 +102,7 @@ namespace ArrayGrowth
             // assuming that there is enough space
             // place the item at the end
             array[Count] = item;
+            workCarriedOut++;
             // increment the counter
             Count++;
         }
@@ -101,33 +116,50 @@ namespace ArrayGrowth
                 // rank cannot be < 0
                 // rank <= count, because we do not want any gaps
                 throw new ArgumentOutOfRangeException(nameof(rank), $"Rank must be between 0 and {Count}, inclusive!");
-                
+
                 // throw new ArgumentOutOfRangeException("rank", );
             }
 
             // copy all elements, up to rank, one step forward
             // starting from the last element, down to the rank parameter
             // the last element is at index count - 1.
-            for (int i = Count-1; i >= rank; i--)
+            for (int i = Count - 1; i >= rank; i--)
             {
                 // copy the element one step forward
-                array[i+1] = array[i];
+                array[i + 1] = array[i];
+                workCarriedOut++;
             }
             // You can also use the array COPY method for the above, however, it still takes a lot of time
             // Here we are making the work requirement for the copy explicit
 
             // array at rank is now free
             array[rank] = item;
+            workCarriedOut++;
             Count++;
         }
-        
+
         private void EnsureCapacity()
         {
             if (Count == array.Length)
             {
+                // The number of elements stored is equal to the number of available spaces (length)
                 // Your array is full!
                 // You need to do something about this!
-                throw new NotImplementedException("TODO!");
+                int newArrayLength = _growthStrategy.GetNewLength(array.Length);
+
+                T[] newArray = new T[newArrayLength];
+
+                // equivalent to the loop below...
+                // array.CopyTo( newArray, 0 );
+
+                for (int i = 0; i < array.Length; i++)
+                {
+                    newArray[i] = array[i];
+                    workCarriedOut++;
+                }
+
+                // replace the old array with the new Array
+                array = newArray;
             }
         }
 
@@ -147,7 +179,7 @@ namespace ArrayGrowth
                 {
                     sb.Append(array[i]!.ToString());
                 }
-                
+
                 sb.Append(", "); // you might want to avoid adding a comma at the end of the list, i.e. when i == count - 1
             }
 
