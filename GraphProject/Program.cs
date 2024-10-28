@@ -22,10 +22,10 @@ graph.AddEdge("F", "G");
 graph.AddEdge("F", "H");
 graph.AddEdge("G", "H");
 
-Console.WriteLine(graph);
+//Console.WriteLine(graph);
 
-
-//GraphSearchResult searchResult = graph.DFS("A");
+// Next lesson to output the graph search result as a directed graph
+GraphSearchResult searchResult = graph.DFS("A");
 
 
 
