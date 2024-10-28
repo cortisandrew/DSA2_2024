@@ -10,7 +10,7 @@ namespace GraphProject
     /// A Graph where each Vertex is uniquely identified using a string
     /// (The name of the Vertex is a string, and it is a "PrimaryKey")
     /// </summary>
-    public class GraphUsingAdjacencyLists // <T> where T:IVertex (possible changes that you may consider)
+    public class GraphUsingAdjacencyLists : IGraph // <T> where T:IVertex (possible changes that you may consider)
     {
         /// <summary>
         /// Hashtable that maps the vector (represented as a string) to its adjacency list
@@ -109,7 +109,7 @@ namespace GraphProject
         }
 
 
-        public LinkedList<string> Adjacencies(string vertex)
+        public IEnumerable<string> Adjacencies(string vertex)
         {
             if (!adjacencyLists.ContainsKey(vertex))
             {

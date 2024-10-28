@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GraphProject
 {
-    public class GraphUsingAdjacencyMatrix
+    public class GraphUsingAdjacencyMatrix : IGraph
     {
         private Dictionary<string, int> mappingFromVertexToIndex = new Dictionary<string, int>();
         private Dictionary<int, string> reverseMappingFromIndex = new Dictionary<int, string>();
@@ -89,7 +89,7 @@ namespace GraphProject
         }
 
 
-        public LinkedList<string> Adjacencies(string vertex)
+        public IEnumerable<string> Adjacencies(string vertex)
         {
             if (!mappingFromVertexToIndex.ContainsKey(vertex))
             {

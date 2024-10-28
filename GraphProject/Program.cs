@@ -25,7 +25,12 @@ graph.AddEdge("G", "H");
 Console.WriteLine(graph);
 
 
+//GraphSearchResult searchResult = graph.DFS("A");
+
+
+
 GraphUsingAdjacencyMatrix graphTwo = new GraphUsingAdjacencyMatrix(new List<string> { "A", "B", "C", "D", "E", "F", "G", "H" });
+
 
 graphTwo.AddEdge("A", "B");
 graphTwo.AddEdge("A", "C");
