@@ -19,7 +19,7 @@ namespace GraphProject
             return adjacencyMatrix;
         }
 
-        public GraphUsingAdjacencyMatrix(List<string> vertices) 
+        public GraphUsingAdjacencyMatrix(List<string> vertices)
         {
             int currentIndex = 0;
             foreach (var vertex in vertices)
@@ -109,6 +109,8 @@ namespace GraphProject
                         );
                 }
             }
-            
+
+            return adjacencyList;
         }
+    }
 }
