@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -46,5 +47,68 @@ namespace GraphProject
             adjacencyMatrix[indexOne, indexTwo] = 1;
             adjacencyMatrix[indexTwo, indexOne] = 1;
         }
-    }
+
+        public int Degree(string vertex)
+        {
+            if (!mappingFromVertexToIndex.ContainsKey(vertex))
+            {
+                throw new ArgumentException($"The vertex name {vertex} does not exist in this graph instance!", nameof(vertex));
+            }
+
+            int index = mappingFromVertexToIndex[vertex];
+
+            int degree = 0;
+            for (int i = 0; i < adjacencyMatrix.Length; i++)
+            {
+                if (adjacencyMatrix[i, index] != 0)
+                {
+                    // we have found an edge!
+                    degree++;
+                }
+            }
+
+            return degree;
+        }
+
+        public bool IsAdjacent(string vertexOne, string vertexTwo)
+        {
+            if (!mappingFromVertexToIndex.ContainsKey(vertexOne))
+            {
+                throw new ArgumentException($"The vertex name {vertexOne} does not exist in this graph instance!", nameof(vertexOne));
+            }
+
+            if (!mappingFromVertexToIndex.ContainsKey(vertexTwo))
+            {
+                throw new ArgumentException($"The vertex name {vertexTwo} does not exist in this graph instance!", nameof(vertexTwo));
+            }
+
+            int i = mappingFromVertexToIndex[vertexOne];
+            int j = mappingFromVertexToIndex[vertexTwo];
+
+            return adjacencyMatrix[i, j] != 0;
+        }
+
+
+        public LinkedList<string> Adjacencies(string vertex)
+        {
+            if (!mappingFromVertexToIndex.ContainsKey(vertex))
+            {
+                throw new ArgumentException($"The vertex name {vertex} does not exist in this graph instance!", nameof(vertex));
+            }
+
+            int index = mappingFromVertexToIndex[vertex];
+
+            LinkedList<string> adjacencyList = new LinkedList<string>();
+            for (int i = 0; i < adjacencyMatrix.Length; i++)
+            {
+                if (adjacencyMatrix[i, index] != 0)
+                {
+                    // we have found an adjacent vertices!
+                    adjacencyList.AddLast(
+                        reverseMappingFromIndex[i]  // get the vertex for index i
+                        );
+                }
+            }
+            
+        }
 }

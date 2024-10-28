@@ -64,6 +64,64 @@ namespace GraphProject
             adjacencyLists[vertexTwo].AddLast(vertexOne);
         }
 
+        public int Degree(string vertex)
+        {
+            if (!adjacencyLists.ContainsKey(vertex))
+            {
+                throw new ArgumentException($"The vertex name {vertex} does not exist in this graph instance!", nameof(vertex));
+            }
+
+            // Average O(1) time, therefore for this analysis, we are going to assume that this lookup is constant time
+            var adjacentyList = adjacencyLists[vertex];
+
+            return adjacentyList.Count;
+
+            // return adjacentyList?.Count ?? 0;
+            // return adjacentyList == null ? 0 : adjacentyList.Count;
+        }
+
+        public bool IsAdjacent(string vertexOne, string vertexTwo)
+        {
+            if (!adjacencyLists.ContainsKey(vertexOne))
+            {
+                throw new ArgumentException($"The vertex name {vertexOne} does not exist in this graph instance!", nameof(vertexOne));
+            }
+
+            if (!adjacencyLists.ContainsKey(vertexTwo))
+            {
+                throw new ArgumentException($"The vertex name {vertexTwo} does not exist in this graph instance!", nameof(vertexTwo));
+            }
+
+            // Average O(1) time, therefore for this analysis, we are going to assume that this lookup is constant time
+            var adjacencyList = adjacencyLists[vertexOne];
+
+            foreach (var adjacentVertex in adjacencyList)
+            {
+                // vertexTwo is found in the adjacency list
+                if (adjacentVertex == vertexTwo)
+                {
+                    return true;
+                }
+            }
+
+            // vertexTwo is NOT in the adjacency list
+            return false;
+        }
+
+
+        public LinkedList<string> Adjacencies(string vertex)
+        {
+            if (!adjacencyLists.ContainsKey(vertex))
+            {
+                throw new ArgumentException($"The vertex name {vertex} does not exist in this graph instance!", nameof(vertex));
+            }
+
+            return adjacencyLists[vertex];
+
+            // Alternative, make a copy of the linked list and return the copy
+
+        }
+
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
