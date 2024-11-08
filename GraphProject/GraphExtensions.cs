@@ -8,8 +8,9 @@ namespace GraphProject
 {
     public static class GraphExtensions
     {
-        public static GraphSearchResult DFS(this IGraph graph, string s) {
-            
+        public static GraphSearchResult DFS(this IGraph graph, string s)
+        {
+
             GraphSearchResult output = new GraphSearchResult(s);
             output.VisitedVertices.Add(s);
 
@@ -38,6 +39,32 @@ namespace GraphProject
 
                 _DFS(graph, adjacentVertex, output);
             }
+        }
+
+        public static GraphSearchResult BFS(this IGraph graph, string s)
+        {
+            GraphSearchResult result = new GraphSearchResult(s);
+            Queue<string> greyVertices = new Queue<string>();
+
+            greyVertices.Enqueue(s);
+            result.VisitedVertices.Add(s);
+
+            while (greyVertices.Count > 0)
+            {
+                string v = greyVertices.Dequeue();
+
+                foreach (string u in graph.Adjacencies(v))
+                {
+                    if (!result.VisitedVertices.Contains(u))
+                    {
+                        result.VisitedVertices.Add(u);
+                        result.Previous[u] = v;
+                        greyVertices.Enqueue(u);
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }

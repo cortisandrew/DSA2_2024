@@ -27,6 +27,20 @@ graph.AddEdge("G", "H");
 // Next lesson to output the graph search result as a directed graph
 GraphSearchResult searchResult = graph.DFS("A");
 
+Console.WriteLine(
+    String.Join(", ",
+                searchResult.FindPathToSourceFromVertex("H")));
+
+Console.WriteLine(
+    String.Join(", ",
+                searchResult.FindPathToVertexFromSource("H")));
+
+
+searchResult = graph.BFS("A");
+
+Console.WriteLine(
+    String.Join(", ",
+                searchResult.FindPathToVertexFromSource("H")));
 
 
 GraphUsingAdjacencyMatrix graphTwo = new GraphUsingAdjacencyMatrix(new List<string> { "A", "B", "C", "D", "E", "F", "G", "H" });

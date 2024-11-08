@@ -17,5 +17,35 @@ namespace GraphProject
         public GraphSearchResult(string sourceVertex) {
             SourceVertex = sourceVertex;
         }
+
+        public List<string> FindPathToSourceFromVertex(string vertex)
+        {
+            List<string> path = new List<string>();
+            string currentVertex = vertex;
+
+            while (currentVertex != SourceVertex) { 
+                path.Add(currentVertex);
+
+                if (Previous.ContainsKey(currentVertex))
+                {
+                    currentVertex = Previous[currentVertex];
+                }
+                else
+                {
+                    throw new InvalidOperationException($"There is no path between {vertex} and {SourceVertex}");
+                }
+            }
+
+            path.Add(SourceVertex);
+            return path;
+        }
+
+        public List<string> FindPathToVertexFromSource(string vertex)
+        {
+            List<string> path = FindPathToSourceFromVertex(vertex);
+            path.Reverse();
+
+            return path;
+        }
     }
 }
