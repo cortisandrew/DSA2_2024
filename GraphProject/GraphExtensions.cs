@@ -41,6 +41,12 @@ namespace GraphProject
             }
         }
 
+        /// <summary>
+        /// Extension method that adds a new method to instances that implement IGraph
+        /// </summary>
+        /// <param name="graph"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static GraphSearchResult BFS(this IGraph graph, string s)
         {
             GraphSearchResult result = new GraphSearchResult(s);
