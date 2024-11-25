@@ -90,6 +90,7 @@ namespace DijkstraProject
         /// <exception cref="InvalidOperationException"></exception>
         public V RemoveMin()
         {
+            // O(n)
             VertexDistance<V>? getItem = _priorityQueue.MinBy(x => x.Distance);
 
             if (getItem == null)
@@ -97,6 +98,7 @@ namespace DijkstraProject
                 throw new InvalidOperationException("The PriorityQueue is empty!");
             }
 
+            // O(n)
             _priorityQueue.Remove(getItem);
             return getItem.Vertex;
         }
