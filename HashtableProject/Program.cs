@@ -37,6 +37,16 @@ Console.WriteLine($"Gerald:{hashtable.Get("Gerald")}");
 // Console.WriteLine($"Harry:{hashtable.Get("Harry")}");
 
 
+hashtable.Remove("Eve");
+hashtable.Remove("Charles");
+hashtable.Remove("Albert");
+Console.WriteLine(hashtable.Remove("Eve")); // already removed, returns false!
+hashtable.Remove("Bernice");
+hashtable.Remove("Dylan");
+hashtable.Remove("Gerald");
+hashtable.Remove("Francine");
+
+
 
 
 Console.ReadLine();
