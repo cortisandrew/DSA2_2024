@@ -183,7 +183,21 @@ namespace HashtableProject
             throw new KeyNotFoundException();
         }
 
-        public bool Remove(K key) { throw new NotImplementedException(); }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns>Return true if the item was deleted successfully!
+        /// False if the key was not found</returns>
+        public bool Remove(K key) { 
+            // search for the key
+            // i) obtaining the hash value
+            // ii) looking up the index with the hash value
+            // iii) looping through the linked list to find where the key is (if at all!)
+            // iv) if the key is found, you will need to perform a remove from the linked list! Return true and Size--
+            // iv) if the key is NOT found, you return False
+            throw new NotImplementedException("In-class exercise!");
+        }
 
     }
 }
