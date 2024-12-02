@@ -11,7 +11,9 @@ namespace HashtableProject
     /// </summary>
     /// <typeparam name="K"></typeparam>
     /// <typeparam name="V"></typeparam>
-    /// <remarks>Sealed means that you cannot inherit</remarks>
+    /// <remarks>Sealed means that you cannot inherit.
+    /// The hashtable assumes that there is no multi-threading!
+    /// </remarks>
     public sealed class ChainingHashtable<K, V> : IHashtable<K, V> where K : IEquatable<K>
     {
         private const int DEFAULT_ARRAY_LENGTH = 4;
@@ -75,15 +77,113 @@ namespace HashtableProject
             }
         }
 
-        public V Get(K key) { throw new NotImplementedException(); }
+        public V Get(K key) {
+            if (key == null)
+            {
+                // there is an issue here!
+                throw new ArgumentNullException(nameof(key), $"The value of {nameof(key)} is NULL. The key must not be NULL!");
+            }
 
-        public bool ContainsKey(K key) { throw new NotImplementedException(); }
+            int hashValue = (key.GetHashCode() & 0x7FFFFFFF) // The 0x7FFFFFFF is used to bit-mask and remove the negative sign from the hashcode if any
+                            % _array.Length; // "compression map" that changes from the possible large result of the first hash function (GetHashCode)
+                                             // and maps it to a value between 0 and _array.Length - 1, inclusive
 
-        public void Update(K key, V value) { throw new NotImplementedException(); }
+            // go to the location of the hashValue and get the bucket we find, possibly no bucket, which returns null
+            ChainingBucket<K, V>? bucket = _array[hashValue];
+
+            if (bucket == null )
+            {
+                throw new KeyNotFoundException();
+            }
+
+            while (bucket != null)
+            {
+                // key found!
+                if (bucket.Key.Equals(key))
+                {
+                    return bucket.Value;
+                }
+
+                // this is not the key that we are looking for
+                bucket = bucket.Next; // move forward one step...
+            }
+
+            // we have gone through the whole list, but found nothing!
+            throw new KeyNotFoundException();
+        }
+
+        public bool ContainsKey(K key) {
+            if (key == null)
+            {
+                // there is an issue here!
+                throw new ArgumentNullException(nameof(key), $"The value of {nameof(key)} is NULL. The key must not be NULL!");
+            }
+
+            int hashValue = (key.GetHashCode() & 0x7FFFFFFF) // The 0x7FFFFFFF is used to bit-mask and remove the negative sign from the hashcode if any
+                            % _array.Length; // "compression map" that changes from the possible large result of the first hash function (GetHashCode)
+                                             // and maps it to a value between 0 and _array.Length - 1, inclusive
+
+            // go to the location of the hashValue and get the bucket we find, possibly no bucket, which returns null
+            ChainingBucket<K, V>? bucket = _array[hashValue];
+
+            if (bucket == null)
+            {
+                return false;
+            }
+
+            while (bucket != null)
+            {
+                // key found!
+                if (bucket.Key.Equals(key))
+                {
+                    return true;
+                }
+
+                // this is not the key that we are looking for
+                bucket = bucket.Next; // move forward one step...
+            }
+
+            // we have gone through the whole list, but found nothing!
+            return false;
+        }
+
+        public void Update(K key, V value) {
+            if (key == null)
+            {
+                // there is an issue here!
+                throw new ArgumentNullException(nameof(key), $"The value of {nameof(key)} is NULL. The key must not be NULL!");
+            }
+
+            int hashValue = (key.GetHashCode() & 0x7FFFFFFF) // The 0x7FFFFFFF is used to bit-mask and remove the negative sign from the hashcode if any
+                            % _array.Length; // "compression map" that changes from the possible large result of the first hash function (GetHashCode)
+                                             // and maps it to a value between 0 and _array.Length - 1, inclusive
+
+            // go to the location of the hashValue and get the bucket we find, possibly no bucket, which returns null
+            ChainingBucket<K, V>? bucket = _array[hashValue];
+
+            if (bucket == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            while (bucket != null)
+            {
+                // key found!
+                if (bucket.Key.Equals(key))
+                {
+                    bucket.Value = value;
+                    return;
+                }
+
+                // this is not the key that we are looking for
+                bucket = bucket.Next; // move forward one step...
+            }
+
+            // we have gone through the whole list, but found nothing!
+            throw new KeyNotFoundException();
+        }
 
         public bool Remove(K key) { throw new NotImplementedException(); }
-
-
 
     }
 }
