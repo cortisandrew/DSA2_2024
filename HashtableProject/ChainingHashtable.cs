@@ -17,11 +17,12 @@ namespace HashtableProject
     public sealed class ChainingHashtable<K, V> : IHashtable<K, V> where K : IEquatable<K>
     {
         private const int DEFAULT_ARRAY_LENGTH = 4;
-        private const double MAX_LOAD_FACTOR = 0.4;
-
+        private const double MAX_LOAD_FACTOR = 0.8; // Trade-off between extra space kept by the instance vs speed of finding an element
+                                                    // a max-load factor of 0.8 is fine for a chaining table
+                                                    // if you have other implementations, the max-load factor might be better if changed. e.g. linear-probing should be around 0.4 or 0.6
 
         /// <summary>
-        /// The number of elements that are currently stored 
+        /// The number of elementList that are currently stored 
         /// </summary>
         public int Size { get; private set; } = 0;
 
@@ -45,44 +46,76 @@ namespace HashtableProject
             {
                 // perform an array growth
                 // rehashing...
-
                 ChainingBucket<K, V>[] newArray = new ChainingBucket<K, V>[_array.Length * 2];
+                List<ChainingBucket<K, V>> oldElements = getAllElementsFromArray(_array);
 
-                // find all the elements in _array
-                // copy them over to newArray with their new hash location
-                List<ChainingBucket<K, V>> oldElements = new List<ChainingBucket<K, V>>();
-
-                // place all elements in the old Element list
-                for (int i = 0; i < _array.Length; i++)
+                if (oldElements.Count != Size)
                 {
-                    if (_array[i] == null)
-                        continue;
-
-                    // add all the elemnts found at location i (remember to go through the whole linked list) to the oldElements
+                    // check! we should be copying over as many elements as the Size of the _array!
+                    throw new ApplicationException("Something went wrong in the code!");
                 }
 
-                foreach (ChainingBucket<K,V> oldElement in oldElements)
+                // move each old element to the new array!
+                foreach (ChainingBucket<K, V> oldElement in oldElements)
                 {
-                    // place this element in your new array!
-                    throw new NotImplementedException();
+                    _add(oldElement.Key, oldElement.Value, newArray, false);
                 }
-
 
                 _array = newArray;
             }
 
+            _add(key, value, _array);
+        }
+
+        private List<ChainingBucket<K, V>> getAllElementsFromArray(ChainingBucket<K, V>[] array)
+        {
+
+            // find all the elementList in _array
+            // copy them over to newArray with their new hash location
+            List<ChainingBucket<K, V>> elementList = new List<ChainingBucket<K, V>>();
+
+            // place all elementList in the old Element list
+            for (int i = 0; i < array.Length; i++)
+            {
+                // We might not require this line of code
+                if (array[i] == null)
+                    continue;
+
+                // add all the elemnts found at location i (remember to go through the whole linked list) to the elementList
+                ChainingBucket<K, V>? cursor = array[i]; // Not NULL!
+
+                while (cursor != null)
+                {
+                    elementList.Add(cursor);
+
+                    cursor = cursor.Next;
+                }
+            }
+            // all of the elementList in the old _array are now in the list elementList
+            return elementList;
+        }
+
+        /// <summary>
+        /// Private method that adds the key and value to the array passed as a parameter
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="array"></param>
+        /// <exception cref="DuplicateKeyException"></exception>
+        private void _add(K key, V value, ChainingBucket<K, V>[] array, bool incrementSize = true)
+        {
             int hashValue = (key.GetHashCode() & 0x7FFFFFFF) // The 0x7FFFFFFF is used to bit-mask and remove the negative sign from the hashcode if any
-                            % _array.Length; // "compression map" that changes from the possible large result of the first hash function (GetHashCode)
-                                             // and maps it to a value between 0 and _array.Length - 1, inclusive
+                            % array.Length; // "compression map" that changes from the possible large result of the first hash function (GetHashCode)
+                                             // and maps it to a value between 0 and array.Length - 1, inclusive
 
             // go to the location of the hashValue and get the bucket we find, possibly no bucket, which returns null
-            ChainingBucket<K, V>? bucket = _array[hashValue];
+            ChainingBucket<K, V>? bucket = array[hashValue];
 
-            if (bucket == null )
+            if (bucket == null)
             {
                 // the location is empty! We can add the new item here!
-                _array[hashValue] = new ChainingBucket<K, V>(key, value);
-                Size++;
+                array[hashValue] = new ChainingBucket<K, V>(key, value);
+                if (incrementSize) { Size++; }
                 return;
             }
 
@@ -90,7 +123,7 @@ namespace HashtableProject
             // Either the key already exists and we found the current item!
             // OR there is a collision
             // (OR BOTH)
-            ChainingBucket<K, V> cursor = (ChainingBucket < K, V > )bucket!;
+            ChainingBucket<K, V> cursor = (ChainingBucket<K, V>)bucket!;
             while (true)
             {
                 // Is the bucket.Key.Equals(key)?
@@ -103,16 +136,18 @@ namespace HashtableProject
                 }
 
                 // this is not the key... keep checking until, either you find an empty next or the key
-                if (cursor.Next == null )
+                if (cursor.Next == null)
                 {
                     cursor.Next = new ChainingBucket<K, V>(key, value);
-                    Size++;
+                    if (incrementSize) { Size++; }
                     return;
                 }
 
                 // move one step forward
                 cursor = cursor.Next;
             }
+
+            throw new InvalidOperationException("This line of code should never be reached! Item was NOT added!");
         }
 
         public V Get(K key) {
