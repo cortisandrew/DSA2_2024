@@ -9,7 +9,7 @@ namespace HashtableProject
     public class OpenAddressingHashtable<K, V> : IHashtable<K, V> where K : IEquatable<K>
     {
         private const int DEFAULT_INITIAL_LENGTH = 8;
-        private const double MAX_LOAD_FACTOR = 0.6; // Trade-off between extra space kept by the instance vs speed of finding an element
+        private const double MAX_LOAD_FACTOR = 0.8; // Trade-off between extra space kept by the instance vs speed of finding an element
         
         private OpenAddressingBucket<K, V>?[] _array;
 
@@ -37,6 +37,7 @@ namespace HashtableProject
 
         public void Add(K key, V value)
         {
+            // TODO: Exercise: Make the implementation faster, by adding the oldElement to the newArray as soon as it is found!
 
             if (key == null)
             {
@@ -46,7 +47,39 @@ namespace HashtableProject
 
             if (LoadFactor > MAX_LOAD_FACTOR)
             {
-                throw new NotImplementedException();
+                // create a new array to store all the values
+                // the new array is twice as large as the old array
+                OpenAddressingBucket<K, V>?[] newArray = new OpenAddressingBucket<K, V>?[2*_array.Length];
+
+                // find all of the old elements
+                List<(K, V)> oldElements = new List<(K, V)>();
+
+                foreach (OpenAddressingBucket<K, V>? element in _array)
+                {
+                    if (element == null || element.Value.IsDeleted)
+                    {
+                        // Either there is no bucket or the bucket is marked as deleted
+                        // There is no "old element" to find here...
+                        continue;
+                    }
+
+                    // element != null
+                    // element.Value is NOT deleted
+
+                    // element contains an old element that I want to copy over
+                    (K,V) oldElement = new (element.Value.Key, element.Value.Value);
+                    oldElements.Add(oldElement);
+                }
+
+                // once all of the old elements are found,
+                // we will place them in the new array
+                foreach (var oldElement in oldElements)
+                {
+                    _add(oldElement.Item1, oldElement.Item2, newArray);
+                }
+
+                // once all the elements are placed in the newArray, replace the old one
+                _array = newArray;
             }
 
             _add(key, value, _array);
@@ -106,7 +139,7 @@ namespace HashtableProject
 
         public bool ContainsKey(K key)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Exercise: Similar to the Get operation");
         }
 
         public V Get(K key)
@@ -223,7 +256,7 @@ namespace HashtableProject
 
         public void Update(K key, V value)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Exercise: Similar to the Get operation");
         }
     }
 }

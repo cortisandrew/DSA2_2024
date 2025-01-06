@@ -10,11 +10,14 @@ int numberOfElements = 100000;
 int numberOfTests = 10000000;
 
 ChainingHashtable<string, int> hashtable = new ChainingHashtable<string, int>();
-OpenAddressingHashtable<string, int> openAddressingHashtable = new OpenAddressingHashtable<string, int>((int)Math.Floor(numberOfElements * 2.5));
-
+//OpenAddressingHashtable<string, int> openAddressingHashtable = new OpenAddressingHashtable<string, int>((int)Math.Floor(numberOfElements * 2.5));
+OpenAddressingHashtable<string, int> openAddressingHashtable = new OpenAddressingHashtable<string, int>();
 
 List<Guid> addedKeys = new List<Guid>();
 Random random = new Random();
+
+Stopwatch swChaining = new Stopwatch();
+Stopwatch swOpenAddressing = new Stopwatch();
 
 for (int i = 0; i < numberOfElements; i++)
 {
@@ -22,17 +25,25 @@ for (int i = 0; i < numberOfElements; i++)
 
     addedKeys.Add(newGuid);
 
+    swChaining.Start();
     hashtable.Add(
         newGuid.ToString(),
         random.Next());
+    swChaining.Stop();
 
+    swOpenAddressing.Start();
     openAddressingHashtable.Add(
         newGuid.ToString(),
         random.Next());
+    swOpenAddressing.Stop();
 }
 
-Stopwatch swChaining = new Stopwatch();
-Stopwatch swOpenAddressing = new Stopwatch();
+Console.WriteLine($"Building the chaining hashtable took: {swChaining.ElapsedTicks} ticks");
+Console.WriteLine($"Building the open addressing hashtable took: {swOpenAddressing.ElapsedTicks} ticks");
+
+swChaining.Reset();
+swOpenAddressing.Reset();
+
 
 for (int i = 0; i < 100; i++)
 {
